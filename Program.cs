@@ -48,7 +48,7 @@ namespace L28_personnelAccounting
                         continue;
 
                     case CommandDisplayAllDossier:
-                        FormatedOutput(persons, jobTitles, displayAllPersons, delimiter);
+                        FormatOutput(persons, jobTitles, displayAllPersons, delimiter);
                         break;
 
                     case CommandDeleteDossier:
@@ -64,7 +64,7 @@ namespace L28_personnelAccounting
                         numberOfPerson = SearchByLastName(persons, lastName, lastNamePosition);
 
                         if (numberOfPerson > -1)
-                            FormatedOutput(persons, jobTitles, numberOfPerson, delimiter);
+                            FormatOutput(persons, jobTitles, numberOfPerson, delimiter);
                         else
                             Console.WriteLine($"\nЧеловек с фамилией {lastName}, в базе данных не найден.");
 
@@ -104,7 +104,7 @@ namespace L28_personnelAccounting
                 persons[persons.GetLength(0) - 1, i] = addedPerson[i];
         }
 
-        static void FormatedOutput(string[,] persons, string[] jobTitles, int numberOfPerson, char delimiter)
+        static void FormatOutput(string[,] persons, string[] jobTitles, int numberOfPerson, char delimiter)
         {
             Console.Clear();
 
