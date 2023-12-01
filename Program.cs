@@ -79,6 +79,7 @@ namespace L28_personnelAccounting
                         Console.ReadKey();
                         continue;
                 }
+
                 Console.WriteLine("\nДля возврата в меню, нажмите любую клавишу.");
                 Console.ReadKey();
             }
