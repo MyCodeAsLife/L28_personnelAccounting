@@ -145,25 +145,25 @@ namespace L28_personnelAccounting
         {
             if (numberOfPerson < persons.GetLength(0) || numberOfPerson >= 0)
             {
-                string[,] tempFullName = new string[persons.GetLength(0) - 1, persons.GetLength(1)];
-                string[] tempJobTitle = new string[jobTitles.Length - 1];
+                string[,] tempPersons = new string[persons.GetLength(0) - 1, persons.GetLength(1)];
+                string[] tempJobTitles = new string[jobTitles.Length - 1];
 
                 for (int i = 0; i < numberOfPerson; i++)
                     for (int j = 0; j < persons.GetLength(1); j++)
-                        tempFullName[i, j] = persons[i, j];
+                        tempPersons[i, j] = persons[i, j];
 
                 for (int i = numberOfPerson + 1; i < persons.GetLength(0); i++)
                     for (int j = 0; j < persons.GetLength(1); j++)
-                        tempFullName[i, j] = persons[i, j];
+                        tempPersons[i, j] = persons[i, j];
 
                 for (int i = 0; i < numberOfPerson; i++)
-                    tempJobTitle[i] = jobTitles[i];
+                    tempJobTitles[i] = jobTitles[i];
 
                 for (int i = numberOfPerson + 1; i < jobTitles.Length; i++)
-                    tempJobTitle[i] = jobTitles[i];
+                    tempJobTitles[i] = jobTitles[i];
 
-                persons = tempFullName;
-                jobTitles = tempJobTitle;
+                persons = tempPersons;
+                jobTitles = tempJobTitles;
             }
         }
     }
