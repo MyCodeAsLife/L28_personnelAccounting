@@ -19,6 +19,7 @@ namespace L28_personnelAccounting
             string[,] persons = new string[0, 0];
             string[] jobTitles = new string[0];
             char delimiter = '-';
+            char separator = ' ';
             int countWordsInFullName = 3;
             int lastNamePosition = 0;
             int displayAllPersons = -1;
@@ -41,7 +42,7 @@ namespace L28_personnelAccounting
                 {
                     case CommandAddDossier:
                         Console.Write("Введите полностью Фамилию Имя Отчество: ");
-                        string[] addedPerson = Console.ReadLine().Split(' ');
+                        string[] addedPerson = Console.ReadLine().Split(separator);
                         Console.Write("Введите наименование должности: ");
                         string jobTitle = Console.ReadLine();
                         AddDossier(ref persons, ref jobTitles, addedPerson, countWordsInFullName, jobTitle);
@@ -75,9 +76,8 @@ namespace L28_personnelAccounting
                         continue;
 
                     default:
-                        Console.WriteLine("Введена неизвестная команда. Повторите ввод.");
-                        Console.ReadKey();
-                        continue;
+                        Console.WriteLine("Введена неизвестная команда.");
+                        break;
                 }
 
                 Console.WriteLine("\nДля возврата в меню, нажмите любую клавишу.");
