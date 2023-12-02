@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,14 +17,10 @@ namespace L28_personnelAccounting
             const int CommandSearchByLastName = 4;
             const int CommandExit = 5;
 
-            string[,] persons = new string[0, 0];
+            string[] persons = new string[0];
             string[] jobTitles = new string[0];
             char delimiter = '-';
-            char separator = ' ';
-            int countWordsInFullName = 3;
-            int lastNamePosition = 0;
             int displayAllPersons = -1;
-            int numberOfPerson;
             int numberMenu;
             bool isOpen = true;
 
@@ -41,11 +38,7 @@ namespace L28_personnelAccounting
                 switch (numberMenu)
                 {
                     case CommandAddDossier:
-                        Console.Write("Введите полностью Фамилию Имя Отчество: ");
-                        string[] addedPerson = Console.ReadLine().Split(separator);
-                        Console.Write("Введите наименование должности: ");
-                        string jobTitle = Console.ReadLine();
-                        AddDossier(ref persons, ref jobTitles, addedPerson, countWordsInFullName, jobTitle);
+                        AddDossier(ref persons, ref jobTitles);
                         continue;
 
                     case CommandDisplayAllDossier:
@@ -53,22 +46,11 @@ namespace L28_personnelAccounting
                         break;
 
                     case CommandDeleteDossier:
-                        Console.Write("Введите номер досье, для его удаления: ");
-                        numberOfPerson = Convert.ToInt32(Console.ReadLine()) - 1;
-                        DeleteDossier(ref persons, ref jobTitles, numberOfPerson);
+                        DeleteDossier(ref persons, ref jobTitles);
                         break;
 
                     case CommandSearchByLastName:
-                        Console.Write("Введите фамилию для поиска досье: ");
-                        string lastName = Console.ReadLine();
-                        Console.Clear();
-                        numberOfPerson = SearchByLastName(persons, lastName, lastNamePosition);
-
-                        if (numberOfPerson > -1)
-                            FormatOutput(persons, jobTitles, numberOfPerson, delimiter);
-                        else
-                            Console.WriteLine($"\nЧеловек с фамилией {lastName}, в базе данных не найден.");
-
+                        SearchByLastName(persons, jobTitles, delimiter);
                         break;
 
                     case CommandExit:
@@ -85,86 +67,113 @@ namespace L28_personnelAccounting
             }
         }
 
-        static void AddDossier(ref string[,] persons, ref string[] jobTitles, string[] addedPerson, int countWordsInFullName, string addedJobTitle)
+        private static void SearchByLastName(string[] persons, string[] jobTitles, char delimiter)
         {
-            string[,] tempFullName = new string[persons.GetLength(0) + 1, countWordsInFullName];
-            string[] tempPosition = new string[jobTitles.Length + 1];
+            Console.Write("Введите фамилию для поиска досье: ");
+            string lastName = Console.ReadLine().ToLower();
+            Console.Clear();
+            int indexOfPerson = SearchByWord(persons, lastName);
 
-            for (int i = 0; i < persons.GetLength(0); i++)
-                for (int j = 0; j < countWordsInFullName; j++)
-                    tempFullName[i, j] = persons[i, j];
-
-            for (int i = 0; i < jobTitles.Length; i++)
-                tempPosition[i] = jobTitles[i];
-
-            jobTitles = tempPosition;
-            jobTitles[jobTitles.Length - 1] = addedJobTitle;
-            persons = tempFullName;
-
-            for (int i = 0; i < countWordsInFullName; i++)
-                persons[persons.GetLength(0) - 1, i] = addedPerson[i];
+            if (indexOfPerson > -1)
+                FormatOutput(persons, jobTitles, indexOfPerson, delimiter);
+            else
+                Console.WriteLine($"\nЧеловек с фамилией {lastName}, в базе данных не найден.");
         }
 
-        static void FormatOutput(string[,] persons, string[] jobTitles, int numberOfPerson, char delimiter)
+        private static void DeleteDossier(ref string[] persons, ref string[] jobTitles)
+        {
+            Console.Write("Введите номер досье, для его удаления: ");
+            int indexOfPerson = Convert.ToInt32(Console.ReadLine()) - 1;
+
+            if (indexOfPerson < persons.Length && indexOfPerson > -1)
+            {
+                persons = DeleteElement(persons, indexOfPerson);
+                jobTitles = DeleteElement(jobTitles, indexOfPerson);
+            }
+            else
+            {
+                Console.WriteLine($"Досье под номером {indexOfPerson}, нет в базе данных.");
+            }
+        }
+
+        private static void AddDossier(ref string[] persons, ref string[] jobTitles)
+        {
+            Console.Write("Введите полностью Фамилию Имя Отчество: ");
+            string addedPerson = Console.ReadLine();
+            Console.Write("Введите наименование должности: ");
+            string jobTitle = Console.ReadLine();
+            persons = ExpandArray(persons, addedPerson);
+            jobTitles = ExpandArray(jobTitles, jobTitle);
+        }
+
+        static string[] ExpandArray(string[] array, string element)
+        {
+            string[] tempArray = new string[array.Length + 1];
+
+            for (int i = 0; i < array.Length; i++)
+                tempArray[i] = array[i];
+
+            tempArray[array.Length] = element;
+            return tempArray;
+        }
+
+        static void FormatOutput(string[] persons, string[] jobTitles, int indexOfPerson, char delimiter)
         {
             Console.Clear();
+            string[] tempLines;
 
-            if (numberOfPerson < 0)
+            if (indexOfPerson < 0)
             {
-                for (int i = 0; i < persons.GetLength(0); i++)
+                for (int i = 0; i < persons.Length; i++)
                 {
-                    Console.Write($"{i + 1}{delimiter}");
+                    tempLines = persons[i].Split();
+                    Console.Write(i + 1);
 
-                    for (int j = 0; j < persons.GetLength(1); j++)
-                        Console.Write($"{persons[i, j]}{delimiter}");
+                    foreach (string line in tempLines)
+                        Console.Write(delimiter + line);
 
-                    Console.WriteLine($"{jobTitles[i]}.");
+                    Console.WriteLine(delimiter + jobTitles[i]);
                 }
             }
             else
             {
-                Console.Write($"{numberOfPerson + 1}{delimiter}");
+                Console.Write(indexOfPerson + 1);
+                tempLines = persons[indexOfPerson].Split();
 
-                for (int i = 0; i < persons.GetLength(1); i++)
-                    Console.Write($"{persons[numberOfPerson, i]}{delimiter}");
+                foreach (string line in tempLines)
+                    Console.Write(delimiter + line);
 
-                Console.WriteLine($"{jobTitles[numberOfPerson]}.\n");
+                Console.WriteLine(delimiter + jobTitles[indexOfPerson]);
             }
         }
 
-        static int SearchByLastName(string[,] persons, string lastName, int lastNamePosition)
+        static int SearchByWord(string[] array, string word)
         {
-            for (int i = 0; i < persons.GetLength(0); i++)
-                if (persons[i, lastNamePosition].ToLower() == lastName.ToLower())
-                    return i;
+            string[] tempLines;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                tempLines = array[i].ToLower().Split();
+
+                for (int j = 0; j < tempLines.Length; j++)
+                    if (tempLines[j] == word)
+                        return i;
+            }
 
             return -1;
         }
 
-        static void DeleteDossier(ref string[,] persons, ref string[] jobTitles, int numberOfPerson)
+        static string[] DeleteElement(string[] array, int index)
         {
-            if (numberOfPerson < persons.GetLength(0) || numberOfPerson >= 0)
-            {
-                string[,] tempPersons = new string[persons.GetLength(0) - 1, persons.GetLength(1)];
-                string[] tempJobTitles = new string[jobTitles.Length - 1];
+            string[] tempArray = new string[array.Length - 1];
 
-                for (int i = 0; i < numberOfPerson; i++)
-                    for (int j = 0; j < persons.GetLength(1); j++)
-                        tempPersons[i, j] = persons[i, j];
+            for (int i = 0; i < index; i++)
+                tempArray[i] = array[i];
 
-                for (int i = numberOfPerson + 1; i < persons.GetLength(0); i++)
-                    for (int j = 0; j < persons.GetLength(1); j++)
-                        tempPersons[i, j] = persons[i, j];
+            for (int i = index + 1; i < array.Length; i++)
+                tempArray[i - 1] = array[i];
 
-                for (int i = 0; i < numberOfPerson; i++)
-                    tempJobTitles[i] = jobTitles[i];
-
-                for (int i = numberOfPerson + 1; i < jobTitles.Length; i++)
-                    tempJobTitles[i] = jobTitles[i];
-
-                persons = tempPersons;
-                jobTitles = tempJobTitles;
-            }
+            return tempArray;
         }
     }
 }
