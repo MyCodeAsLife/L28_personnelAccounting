@@ -27,7 +27,6 @@ namespace L28_personnelAccounting
 
             bool isOpen = true;
 
-
             while (isOpen)
             {
                 Console.Clear();
