@@ -19,9 +19,12 @@ namespace L28_personnelAccounting
 
             string[] persons = new string[0];
             string[] jobTitles = new string[0];
+
             char delimiter = '-';
+
             int displayAllPersons = -1;
             int numberMenu;
+
             bool isOpen = true;
 
 
@@ -31,8 +34,10 @@ namespace L28_personnelAccounting
                 Console.WriteLine("Реестр компании \"Рога и копыта\"");
                 Console.WriteLine($"{CommandAddDossier}) Добавить досье.\n{CommandDisplayAllDossier}) Вывести все досье.\n{CommandDeleteDossier}) Удалить досье." +
                                   $"\n{CommandSearchByLastName}) Поиск по фамилии.\n{CommandExit}) Выход.\n");
+
                 Console.Write("Выбирите номер меню: ");
                 numberMenu = Convert.ToInt32(Console.ReadLine());
+
                 Console.Clear();
 
                 switch (numberMenu)
@@ -69,15 +74,31 @@ namespace L28_personnelAccounting
 
         private static void SearchByLastName(string[] persons, string[] jobTitles, char delimiter)
         {
+            int indexOfPerson = -1;
+
             Console.Write("Введите фамилию для поиска досье: ");
             string lastName = Console.ReadLine().ToLower();
-            Console.Clear();
-            int indexOfPerson = SearchByWord(persons, lastName);
 
-            if (indexOfPerson > -1)
-                FormatOutput(persons, jobTitles, indexOfPerson, delimiter);
-            else
-                Console.WriteLine($"\nЧеловек с фамилией {lastName}, в базе данных не найден.");
+            Console.Clear();
+
+            for (int i = 0; i < persons.Length; i++)
+            {
+                indexOfPerson = SearchByWord(persons, lastName, indexOfPerson + 1);
+
+                if (indexOfPerson > -1)
+                {
+                    FormatOutput(persons, jobTitles, indexOfPerson, delimiter);
+                }
+                else if (i == 0)
+                {
+                    Console.WriteLine($"\nЧеловек с фамилией {lastName}, в базе данных не найден.");
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         private static void DeleteDossier(ref string[] persons, ref string[] jobTitles)
@@ -100,8 +121,10 @@ namespace L28_personnelAccounting
         {
             Console.Write("Введите полностью Фамилию Имя Отчество: ");
             string addedPerson = Console.ReadLine();
+
             Console.Write("Введите наименование должности: ");
             string jobTitle = Console.ReadLine();
+
             persons = ExpandArray(persons, addedPerson);
             jobTitles = ExpandArray(jobTitles, jobTitle);
         }
@@ -119,11 +142,12 @@ namespace L28_personnelAccounting
 
         static void FormatOutput(string[] persons, string[] jobTitles, int indexOfPerson, char delimiter)
         {
-            Console.Clear();
             string[] tempLines;
 
             if (indexOfPerson < 0)
             {
+                Console.Clear();
+
                 for (int i = 0; i < persons.Length; i++)
                 {
                     tempLines = persons[i].Split();
@@ -147,11 +171,11 @@ namespace L28_personnelAccounting
             }
         }
 
-        static int SearchByWord(string[] array, string word)
+        static int SearchByWord(string[] array, string word, int index = 0)
         {
             string[] tempLines;
 
-            for (int i = 0; i < array.Length; i++)
+            for (int i = index; i < array.Length; i++)
             {
                 tempLines = array[i].ToLower().Split();
 
